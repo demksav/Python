@@ -112,9 +112,12 @@ def buy():
         session["shares_price"] = usd(shares_price)
 
         cash -= shares_price
-        db.execute("UPDATE users SET cash=? WHERE id=?", (cash, session["user_id"]))
-        db.execute("INSERT INTO shares (user_id, symbol, name, shares, price, status, date) VALUES (?,?,?,?,?,?,?)",
-                   (session["user_id"], session["symbol"], session["name"], session["shares"], symbol_info['price'], 1, datetime.now()))
+        #db.execute("UPDATE users SET cash=? WHERE id=?", (cash, session["user_id"]))
+        db.execute("UPDATE users SET cash=:cash WHERE id=:id", cash = cash, id = session["user_id"])
+        #db.execute("INSERT INTO shares (user_id, symbol, name, shares, price, status, date) VALUES (?,?,?,?,?,?,?)", (session["user_id"], session["symbol"], session["name"], session["shares"], symbol_info['price'], 1, datetime.now()))
+        db.execute("""INSERT INTO shares (user_id, symbol, name, shares, price, status, date)
+                    VALUES (:user_id, :symbol, :name, :shares, :price, 1, :date)""",
+                    user_id=session["user_id"], symbol=session["symbol"], name=session["name"], shares=session["shares"], price=symbol_info['price'], date=datetime.now())
 
         # Bought !!! to HTML
         shares_in = db.execute(
@@ -263,10 +266,14 @@ def register():
                 if list["username"] == username:
                     return apology("Username is not available", 400)
             password = request.form.get("password")
-
-            result = db.execute("INSERT INTO users (username, hash) VALUES (?,?)", (username, generate_password_hash(password)))
-
-            #session["user_id"] = result
+            hash = generate_password_hash(password)
+            #result = db.execute("INSERT INTO users (username, hash) VALUES (?,?)", (username, hash))
+            #result = db.execute("INSERT username, hash INTO users VALUES (username=:username, hash=:hash)", username = username, hash=hash)
+            #result = db.execute("INSERT username=:username, hash=:hash INTO users", username = username, hash = hash)
+            #result = db.execute("INSERT username INTO users VALUES username=:username", username = username )
+            result = db.execute("INSERT INTO users (username, hash) VALUES (:username, :hash)", username = username, hash = hash)
+            session["user_id"] = result
+            #return str(result)
         return redirect("/")
 
 
@@ -312,9 +319,14 @@ def sell():
             sum_sell = symbol_info["price"] * shares
             cash_db = db.execute("SELECT cash FROM users WHERE id = :user_id", user_id=session["user_id"])
             cash_after = cash_db[0]["cash"] + sum_sell
-            db.execute("UPDATE users SET cash=? WHERE id=?", (cash_after, session["user_id"]))
-            db.execute("INSERT INTO shares (user_id, symbol, name, shares, price, status, date) VALUES (?,?,?,?,?,?,?)",
-                       (session["user_id"], list["symbol"], list["name"], - shares, symbol_info['price'], 1, datetime.now()))
+            #db.execute("UPDATE users SET cash=? WHERE id=?", (cash_after, session["user_id"]))
+            db.execute("UPDATE users SET cash=:cash WHERE id=:id", cash=cash_after, id=session["user_id"])
+
+            #db.execute("""INSERT INTO shares (user_id, symbol, name, shares, price, status, date) VALUES (?,?,?,?,?,?,?)""", (session["user_id"], list["symbol"], list["name"], - shares, symbol_info['price'], 1, datetime.now()))
+            #db.execute("INSERT user_id, symbol, name, shares, price, status, date INTO users VALUES (user_id=:user_id, symbol=:symbol, name=:name, shares=:shares, price=:price, 1, date=:date)", (user_id=session["user_id"], symbol=list["symbol"], name=list["name"], shares=-shares, price=symbol_info['price'], date=datetime.now())
+            db.execute("""INSERT INTO shares (user_id, symbol, name, shares, price, status, date)
+                        VALUES (:user_id, :symbol, :name, :shares, :price, 1, :date)""",
+                        user_id=session["user_id"], symbol=list["symbol"], name=list["name"], shares=-shares, price=symbol_info['price'], date=datetime.now())
 
         # SOLD !!! to HTML
         if shares_after == 0:
@@ -358,7 +370,7 @@ def pwdchange():
         if not check_password_hash(rows[0]["hash"], request.form.get("password")):
             return apology("invalid user password", 403)
 
-        db.execute("UPDATE users SET hash=? WHERE id=?", (generate_password_hash(password_new), session["user_id"]))
+        db.execute("UPDATE users SET hash=:hash WHERE id=:id", hash = generate_password_hash(password_new), id = session["user_id"])
 
     return redirect("/login")
 

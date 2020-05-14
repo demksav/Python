@@ -39,8 +39,8 @@ def lookup(symbol):
 
     # Contact API
     try:
-        response = requests.get(f"https://api.iextrading.com/1.0/stock/{urllib.parse.quote_plus(symbol)}/quote")
-        #response = requests.get(f"https://sandbox.iexapis.com/stable/stock/{urllib.parse.quote_plus(symbol)}/quote?token=Tpk_b3fa1914057541388641a4eb38066d6e")
+        #response = requests.get(f"https://api.iextrading.com/1.0/stock/{urllib.parse.quote_plus(symbol)}/quote")
+        response = requests.get(f"https://sandbox.iexapis.com/stable/stock/{urllib.parse.quote_plus(symbol)}/quote?token=Tpk_b3fa1914057541388641a4eb38066d6e")
         response.raise_for_status()
     except requests.RequestException:
         return None
