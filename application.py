@@ -114,7 +114,7 @@ def buy():
         cash -= shares_price
         db.execute("UPDATE users SET cash=? WHERE id=?", (cash, session["user_id"]))
         db.execute("INSERT INTO shares (user_id, symbol, name, shares, price, status, date) VALUES (?,?,?,?,?,?,?)",
-                   session["user_id"], session["symbol"], session["name"], session["shares"], symbol_info['price'], 1, datetime.now())
+                   (session["user_id"], session["symbol"], session["name"], session["shares"], symbol_info['price'], 1, datetime.now()))
 
         # Bought !!! to HTML
         shares_in = db.execute(
@@ -240,6 +240,7 @@ def register():
     """Register user"""
     if request.method == "GET":
         return render_template("register.html")
+
     if request.method == "POST":
         # Ensure username was submitted
         if not request.form.get("username"):
@@ -263,9 +264,9 @@ def register():
                     return apology("Username is not available", 400)
             password = request.form.get("password")
 
-            result = db.execute("INSERT INTO users (username, hash) VALUES (?,?)", username, generate_password_hash(password))
+            result = db.execute("INSERT INTO users (username, hash) VALUES (?,?)", (username, generate_password_hash(password)))
 
-            session["user_id"] = result
+            #session["user_id"] = result
         return redirect("/")
 
 
@@ -313,7 +314,7 @@ def sell():
             cash_after = cash_db[0]["cash"] + sum_sell
             db.execute("UPDATE users SET cash=? WHERE id=?", (cash_after, session["user_id"]))
             db.execute("INSERT INTO shares (user_id, symbol, name, shares, price, status, date) VALUES (?,?,?,?,?,?,?)",
-                       session["user_id"], list["symbol"], list["name"], - shares, symbol_info['price'], 1, datetime.now())
+                       (session["user_id"], list["symbol"], list["name"], - shares, symbol_info['price'], 1, datetime.now()))
 
         # SOLD !!! to HTML
         if shares_after == 0:
