@@ -9,7 +9,7 @@
         <div class="form-group">
             <input autocomplete="off" autofocus class="form-control" name="symbol" list="symbol" autocomplete="off" placeholder="Symbol" type="text">
             <datalist id="symbol">
-                <select>
+                <select id="symbol" name="symbol" >
                     {% for list in session["sh_symbol"] %}
                          <option value="{{ list["symbol"] }}">
                     {% endfor %}

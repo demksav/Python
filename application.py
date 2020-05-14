@@ -84,25 +84,28 @@ def buy():
         return render_template("buy.html")
     if request.method == "POST":
         if not request.form.get("symbol"):
-            return apology("symbol missing", 403)
+            return apology("symbol missing", 400)
         elif not request.form.get("shares"):
-            return apology("shares missing", 403)
+            return apology("shares missing", 400)
 
         symbol_info = lookup(request.form.get("symbol"))
         if symbol_info is None:
-            return apology("invalid symbol", 403)
+            return apology("invalid symbol", 400)
 
         session["name"] = symbol_info['name']
         session["symbol"] = symbol_info['symbol']
         session["price"] = usd(symbol_info['price'])
-        session["shares"] = request.form.get("shares")
+        shares_f = request.form.get("shares")
+        if not int(shares_f):
+            return apology("shares must be positive", 400)
+        session["shares"] = shares_f
 
         cash_in = db.execute(
             "SELECT cash FROM users WHERE id = :user_id", user_id=session["user_id"])
 
         cash = cash_in[0]["cash"]
         if cash < symbol_info['price']:
-            return apology("not enough cash", 403)
+            return apology("can't afford", 400)
 
         shares_price = symbol_info['price'] * int(session["shares"])
         session["shares_price"] = usd(shares_price)
@@ -219,11 +222,11 @@ def quote():
         return render_template("quote.html")
     if request.method == "POST":
         if not request.form.get("symbol"):
-            return apology("symbol missing", 403)
+            return apology("symbol missing", 400)
 
         symbol_info = lookup(request.form.get("symbol"))
         if symbol_info is None:
-            return apology("invalid symbol", 403)
+            return apology("invalid symbol", 400)
         session["name"] = symbol_info['name']
         session["symbol"] = symbol_info['symbol']
         session["price"] = usd(symbol_info['price'])
@@ -249,7 +252,13 @@ def register():
         # регистрируем его в базе даннных и редиректим на главную страницу
         else:
             username = request.form.get("username")
+            users = db.execute("SELECT username FROM users")
+
+            for list in users:
+                if list["username"] == username:
+                    return apology("Username is not available", 400)
             password = request.form.get("password")
+
             result = db.execute("INSERT INTO users (username, hash) VALUES (?,?)", username, generate_password_hash(password))
             session["user_id"] = result
         return redirect("/")
