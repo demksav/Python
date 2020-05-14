@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+
+<script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script>
+    $( document ).ready(function(){
+	    $( "form" ).submit(function(){
+	    event.preventDefault(); // отменяем действие события по умолчанию
+	    //создаем переменную, которая содержит закодированный набор элементов формы в виде строки
+        //if (!document.forms["form"].elements["username"].value.length) {
+	        //alert('Provide username');
+	    //}
+        //else if ((!document.forms["form"].elements["password"].value.length) || (!document.forms["form"].elements["confirmation"].value.length)) {
+	        //alert('Provide password and/or confirmation');
+	    //}
+	    //else if (document.forms["form"].elements["password"].value != document.forms["form"].elements["confirmation"].value) {
+            //alert('Passwords not match');
+        //}
+        //else {
+            var formData = document.forms["form"].elements["username"].name + "=" + document.forms["form"].elements["username"].value;
+            $.get( '/check', formData, function(data) { //  передаем и загружаем данные с сервера с помощью HTTP запроса методом GET
+	        if (!$.parseJSON(data)) {
+                alert('Username is not available');
+                } else {
+                    form.submit();
+                }
+	            });
+           // }
+        });
+	});
+
+    </script>
+
+    <form name="form" action="/register" method="post" onsubmit="return validate()">
+        <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text">
+            <span style="color:red" id="usernamef"></span><br />
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="password" placeholder="Password" type="password">
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="confirmation" placeholder="Password (again)" type="password">
+        </div>
+        <button class="btn btn-primary" type="submit">Register</button>
+    </form>
+
+{% endblock %}
