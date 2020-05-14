@@ -96,8 +96,9 @@ def buy():
         session["symbol"] = symbol_info['symbol']
         session["price"] = usd(symbol_info['price'])
         shares_f = request.form.get("shares")
-        if not int(shares_f):
-            return apology("shares must be positive", 400)
+        for c in shares_f:
+            if not c.isdigit():
+                return apology("shares must be positive", 400)
         session["shares"] = shares_f
 
         cash_in = db.execute(
