@@ -22,7 +22,9 @@
             //alert('Passwords not match');
         //}
         //else {
-            var formData = document.forms["form"].elements["username"].name + "=" + document.forms["form"].elements["username"].value;
+            //alert(document.forms["form"].elements["username"].value.length);
+            var formData = $( this ).serialize(); // создаем переменную, которая содержит закодированный набор элементов формы в виде строки
+            //var formData = document.forms["form"].elements["username"].name + "=" + document.forms["form"].elements["username"].value;
             $.get( '/check', formData, function(data) { //  передаем и загружаем данные с сервера с помощью HTTP запроса методом GET
 	        if (!$.parseJSON(data)) {
                 alert('Username is not available');

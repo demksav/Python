@@ -142,17 +142,18 @@ def check():
     """Return true if username available, else false, in JSON format"""
 
     if request.method == "GET":
+
         username = request.args.get("username")
-    if len(username) < 1:
-        return jsonify(False)
-
-    users = db.execute("SELECT username FROM users")
-
-    for list in users:
-        if list["username"] == username:
+        if len(username) < 1:
             return jsonify(False)
 
-    return jsonify(True)
+        users = db.execute("SELECT username FROM users")
+
+        for list in users:
+            if list["username"] == username:
+                return jsonify(False)
+
+        return jsonify(True)
 
 
 @app.route("/history")
@@ -253,6 +254,8 @@ def register():
         # регистрируем его в базе даннных и редиректим на главную страницу
         else:
             username = request.form.get("username")
+            if len(username) < 1:
+                return "must provide username", 400
             users = db.execute("SELECT username FROM users")
 
             for list in users:
@@ -261,6 +264,7 @@ def register():
             password = request.form.get("password")
 
             result = db.execute("INSERT INTO users (username, hash) VALUES (?,?)", username, generate_password_hash(password))
+
             session["user_id"] = result
         return redirect("/")
 
