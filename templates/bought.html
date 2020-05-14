@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Bought!
+{% endblock %}
+{% block main %}
+    <style>
+        table {
+        width: 100%; /* Ширина таблицы */
+        margin: auto; /* Выравниваем таблицу по центру окна  */
+        }
+        td, th {
+            text-align: left; /* Выравниваем текст по левому краю ячейки */
+            border-top: 1px solid #DDDDDD; /* Линия сверху строки */
+            padding: .3em 1em;
+        }
+        tr:nth-child(odd) {background-color:#FFFFFF;}
+        tr:nth-child(even) {background-color:#F5F5F5;}
+    </style>
+
+    <table id="myBTable">
+        <tr><th width=15%>Symbol</th><th width=35%>Name</th><th>Shares</th><th>Price</th><th>Total</th></tr>
+
+        {% for list in session["shares_in"] %}
+            <tr>
+                <td>{{ list["symbol"] }}</td>
+                <td>{{ list["name"] }}</td>
+                <td>{{ list["SUM(shares)"] }}</td>
+                <td>{{ list["price"] }}</td>
+                <td>{{ list["shares_price"] }}</td>
+            </tr>
+        {% endfor %}
+        {% block tr %}
+        <tr>
+                <td> CASH </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td>{{ session["cash"] }}</td>
+        </tr>
+         <tr>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+                <td>{{ session["total"] }}</td>
+        </tr>
+        {% endblock %}
+    </table>
+
+{% endblock %}
