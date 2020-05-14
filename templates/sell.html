@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Sell
+{% endblock %}
+
+{% block main %}
+    <form action="/sell" method="post">
+        <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="symbol" list="symbol" autocomplete="off" placeholder="Symbol" type="text">
+            <datalist id="symbol">
+                <select id="symbol" name="symbol" >
+                    {% for list in session["sh_symbol"] %}
+                         <option value="{{ list["symbol"] }}">
+                    {% endfor %}
+  				</select>
+			</datalist>
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="shares" min="0" placeholder="Shares" type="number">
+        </div>
+        <button class="btn btn-primary" type="submit">Sell</button>
+    </form>
+{% endblock %}
