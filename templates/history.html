@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Sold!
+{% endblock %}
+{% block main %}
+    <style>
+        table {
+        width: 100%; /* Ширина таблицы */
+        margin: auto; /* Выравниваем таблицу по центру окна  */
+        }
+        td, th {
+            text-align: left; /* Выравниваем текст по левому краю ячейки */
+            border-top: 1px solid #DDDDDD; /* Линия сверху строки */
+            padding: .3em 2em;
+        }
+        tr:nth-child(odd) {background-color:#FFFFFF;}
+        tr:nth-child(even) {background-color:#F5F5F5;}
+    </style>
+
+    <table id="mySTable">
+        <tr><th width=15%>Symbol</th><th width=25%>Shares</th><th>Price</th><th>Transacted</th></tr>
+
+        {% for list in session["sh_history"] %}
+            <tr>
+                <td>{{ list["symbol"] }}</td>
+                <td>{{ list["shares"] }}</td>
+                <td>{{ list["price"] }}</td>
+                <td>{{ list["date"] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}
